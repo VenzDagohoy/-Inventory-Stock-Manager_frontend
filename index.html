@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Inventory Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        
+        <!-- Header -->
+        <header class="main-header">
+            <div class="logo">
+                <span class="icon">
+                    <img src="box.png" alt="Store Logo" style="height: 49px; width: auto;"></span> 
+                    Store Manager
+            </div>
+            
+            <div class="nav-tabs">
+                <button id="tab-dashboard" class="btn-tab-dashboard active" onclick="switchTab('dashboard')">Dashboard</button>
+                <button id="tab-history" class="btn-tab-history" onclick="switchTab('history')">History</button>
+            </div>
+        </header>
+
+        <!-- Dashbord view -->
+        <div id="dashboard-view" class="view-container">
+            <!-- Overall Dashboard Stats -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <h3>Total Products Sold</h3>
+                    <p id="overall-sold" class="stat-value">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Overall Earnings</h3>
+                    <p id="overall-earnings" class="stat-value text-success">Php 0.00</p>
+                </div>
+            </div>
+            
+            <div class="layout-grid">
+                <!-- Left column forms -->
+                <div class="left-panel">
+                    
+                    <!-- Edit product form -->
+                    <div class="card hidden" id="edit-card">
+                        <h2>Edit Product</h2>
+                        <form id="edit-form">
+                            <input type="hidden" id="edit-id">
+                            <div class="form-group">
+                                <label for="edit-name">Product Name:</label>
+                                <input type="text" id="edit-name" required>
+                            </div>
+                            <div class="form-group row-group">
+                                <div class="input-half">
+                                    <label for="edit-price">Price (Php):</label>
+                                    <input type="number" id="edit-price" required step="0.01" min="0">
+                                </div>
+                                <div class="input-half">
+                                    <label for="edit-stock">Stock:</label>
+                                    <input type="number" id="edit-stock" required step="1" min="0">
+                                </div>
+                            </div>
+                            <div class="btn-group">
+                                <button type="submit" class="btn-save-edit">Save</button>
+                                <button type="button" class="btn-cancel-edit" onclick="cancelEdit()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Add product form -->
+                    <div class="card">
+                        <h2>Add New Product</h2>
+                        <form id="product-form">
+                            <div class="form-group">
+                                <label for="name">Product Name:</label>
+                                <input type="text" id="name" required placeholder="e.g., Mechanical Keyboard">
+                            </div>
+                            <div class="form-group row-group">
+                                <div class="input-half">
+                                    <label for="price">Price (Php):</label>
+                                    <input type="number" id="price" required step="0.01" min="0" placeholder="0.00">
+                                </div>
+                                <div class="input-half">
+                                    <label for="stock">Initial Stock:</label>
+                                    <input type="number" id="stock" required step="1" min="0" placeholder="0">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-add-product full-width">Add Product</button>
+                        </form>
+                        <div id="form-message" class="message"></div>
+                    </div>
+
+                    <!-- End of day action -->
+                    <div class="card reset-card">
+                        <h2>End of Day</h2>
+                        <p style="margin-top: 0; margin-bottom: 15px; color: var(--text-muted); font-size: 14.4px;">
+                            Save today's totals to History and reset sold counters back to zero.
+                        </p>
+                        <button id="reset-daily-btn" class="btn-reset-history full-width">Reset & Save to History</button>
+                    </div>
+
+                    <!-- Log out button -->
+                    <button id="logout-btn" class="btn-logout full-width">Log out</button>
+                </div>
+
+                <!-- Right column inventory data -->
+                <div class="right-panel">
+                    <div class="card search-card">
+                        <!-- Unified Smart Search Row -->
+                        <div class="search-row no-margin">
+                            <input type="text" id="searchInput" placeholder="Search by Product Name or ID...">
+                            <button onclick="performSearch()" class="btn-search">Search</button>
+                            <button onclick="fetchProducts()" class="btn-reset-search">Reset</button>
+                        </div>
+                        <div id="search-message" class="message"></div>
+                    </div>
+
+                    <div class="card table-card">
+                        <h2>Inventory Directory</h2>
+                        <div id="loading">Loading products...</div>
+                        <div class="table-responsive">
+                            <table id="product-table">
+                                <thead>
+                                    <tr>
+                                        <th>Product Details</th>
+                                        <th>Stock</th>
+                                        <th>Sold</th>
+                                        <th>Earnings</th>
+                                        <th class="text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="product-list">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History view -->
+        <div id="history-view" class="view-container hidden">
+            <div class="card">
+                <h2>Daily Sales History</h2>
+                <div class="table-responsive">
+                    <table id="history-table">
+                        <thead>
+                            <tr>
+                                <th>Date Record</th>
+                                <th>Total Items Sold</th>
+                                <th>Total Earnings</th>
+                                <th>Timestamp Recorded</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-list">
+                            <!-- History data injected dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
