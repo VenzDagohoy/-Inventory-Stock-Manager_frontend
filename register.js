@@ -1,5 +1,5 @@
 // const API_URL = "http://localhost:3000";
-const API_URL = "https://inventory-stock-manager-backend.onrender.com/";
+const API_URL = "https://inventory-stock-manager-backend.onrender.com";
 
 const registerForm = document.querySelector("#register-form");
 const message = document.querySelector("#message");
