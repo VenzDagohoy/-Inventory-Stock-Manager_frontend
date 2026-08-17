@@ -52,7 +52,6 @@ const editForm = document.getElementById("edit-form");
 
 // Dashboard function
 async function fetchProducts() {
-    // Clear the search bar when resetting the table
     const searchInput = document.getElementById("searchInput");
     if (searchInput) searchInput.value = "";
 
@@ -77,12 +76,10 @@ window.performSearch = async function() {
     const query = document.getElementById("searchInput").value.trim();
     if (!query) return;
     
-    // Check if the query contains only digits or id
     const isId = /^\d+$/.test(query);
     
     if (isId) {
         try {
-            // Try search by ID
             const idResponse = await fetch(`${API_URL}/products/${query}`, {
                 headers: { "Authorization": `Bearer ${token}` }
             });
@@ -92,14 +89,13 @@ window.performSearch = async function() {
             if (idResponse.ok) {
                 const data = await idResponse.json();
                 renderTable([data.product]);
-                return; // If ID was successfully found
+                return;
             }
         } catch (error) {
             console.error("Error searching by ID:", error);
         }
     }
     
-    // If not an id, or or id not found, go back to search by name
     try {
         const nameResponse = await fetch(`${API_URL}/products?name=${query}`, {
             headers: { "Authorization": `Bearer ${token}` }
@@ -224,7 +220,6 @@ window.sellProduct = async function(id) {
         if (handleUnauthorized(response)) return;
         
         if (response.ok) {
-            // Refresh the current view based on the active search query
             const searchVal = document.getElementById("searchInput")?.value;
             if (searchVal) performSearch();
             else fetchProducts();
@@ -345,7 +340,7 @@ fetchProducts();
 
 
 // ---------------------------------------------------------
-// AI Chatbot UI Integration
+// AI Chatbot UI Integration (User-Scoped)
 // ---------------------------------------------------------
 
 const chatbotToggleBtn = document.getElementById("chatbot-toggle");
@@ -355,44 +350,54 @@ const chatbotForm = document.getElementById("chatbot-form");
 const chatbotInput = document.getElementById("chatbot-input");
 const chatbotMessages = document.getElementById("chatbot-messages");
 
-// Open chat window
 chatbotToggleBtn.addEventListener("click", () => {
     chatbotWindow.classList.remove("hidden");
     chatbotToggleBtn.classList.add("hidden");
     chatbotInput.focus();
 });
 
-// Close chat window
 chatbotCloseBtn.addEventListener("click", () => {
     chatbotWindow.classList.add("hidden");
     chatbotToggleBtn.classList.remove("hidden");
 });
 
-// Add a message bubble to the chat UI
 function appendMessage(text, sender) {
     const msgDiv = document.createElement("div");
     msgDiv.classList.add("message");
     msgDiv.classList.add(sender === "user" ? "user-message" : "ai-message");
     msgDiv.textContent = text;
     chatbotMessages.appendChild(msgDiv);
-    
-    // Auto-scroll to the bottom
     chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
 }
 
-// Handle form submission
+// Helper to extract userId from the session token
+function getUserIdFromToken() {
+    if (!token) return null;
+    try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        return payload.userId;
+    } catch (e) {
+        console.error("Failed to parse token payload:", e);
+        return null;
+    }
+}
+
 chatbotForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     
     const userText = chatbotInput.value.trim();
     if (!userText) return;
 
-    // Display user's message
+    const currentUserId = getUserIdFromToken();
+    if (!currentUserId) {
+        appendMessage("Session expired. Please log in again.", "ai");
+        return;
+    }
+
     appendMessage(userText, "user");
     chatbotInput.value = "";
     chatbotInput.disabled = true;
 
-    // Display a temporary loading message
     const loadingId = "loading-" + Date.now();
     const loadingDiv = document.createElement("div");
     loadingDiv.classList.add("message", "ai-message");
@@ -401,29 +406,32 @@ chatbotForm.addEventListener("submit", async (e) => {
     chatbotMessages.appendChild(loadingDiv);
     chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
 
-    // Send to Python FastAPI engine
     try {
         const response = await fetch("https://inventory-stock-manager-ai.onrender.com/api/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: userText })
+            body: JSON.stringify({ 
+                message: userText,
+                user_id: currentUserId 
+            })
         });
         
         const data = await response.json();
         
-        // Remove loading text and show real response
-        document.getElementById(loadingId).remove();
+        const loader = document.getElementById(loadingId);
+        if (loader) loader.remove();
+        
         appendMessage(data.reply, "ai");
         
-        // If the AI successfully sold something, refresh the dashboard tables!
-        if (data.reply.toLowerCase().includes("success")) {
+        if (data.reply && data.reply.toLowerCase().includes("success")) {
             fetchProducts();
         }
         
     } catch (error) {
         console.error("AI Error:", error);
-        document.getElementById(loadingId).remove();
-        appendMessage("Error: Could not connect to the AI engine. Make sure the Python server is running.", "ai");
+        const loader = document.getElementById(loadingId);
+        if (loader) loader.remove();
+        appendMessage("Error: Could not connect to the AI engine.", "ai");
     } finally {
         chatbotInput.disabled = false;
         chatbotInput.focus();
