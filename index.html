@@ -161,6 +161,27 @@
             </div>
         </div>
 
+        <!-- AI Chatbot UI -->
+        <button id="chatbot-toggle" class="chatbot-toggle-btn">
+            <span class="chat-icon">💬</span> Ask AI
+        </button>
+
+        <div id="chatbot-window" class="chatbot-window hidden">
+            <div class="chatbot-header">
+                <h3>Store Assistant AI</h3>
+                <button id="chatbot-close" class="chatbot-close-btn">✖</button>
+            </div>
+            <div id="chatbot-messages" class="chatbot-messages">
+                <div class="message ai-message">
+                    Hello! I'm your store assistant. You can ask me to check sales data or sell items for you.
+                </div>
+            </div>
+            <form id="chatbot-form" class="chatbot-input-area">
+                <input type="text" id="chatbot-input" placeholder="Type a command..." required autocomplete="off">
+                <button type="submit" class="chatbot-send-btn">➤</button>
+            </form>
+        </div>
+
     </div>
     <script src="app.js"></script>
 </body>

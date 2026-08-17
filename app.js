@@ -23,7 +23,7 @@ function handleUnauthorized(response) {
     return false;
 }
 
-// Navigation Llgic
+// Navigation Logic
 window.switchTab = function(tabName) {
     document.getElementById("dashboard-view").classList.add("hidden");
     document.getElementById("history-view").classList.add("hidden");
@@ -50,7 +50,7 @@ const formMessage = document.getElementById("form-message");
 const editCard = document.getElementById("edit-card");
 const editForm = document.getElementById("edit-form");
 
-// DAshboared function
+// Dashboard function
 async function fetchProducts() {
     // Clear the search bar when resetting the table
     const searchInput = document.getElementById("searchInput");
@@ -342,3 +342,90 @@ async function fetchHistory() {
 
 // Initial boot
 fetchProducts();
+
+
+// ---------------------------------------------------------
+// AI Chatbot UI Integration
+// ---------------------------------------------------------
+
+const chatbotToggleBtn = document.getElementById("chatbot-toggle");
+const chatbotWindow = document.getElementById("chatbot-window");
+const chatbotCloseBtn = document.getElementById("chatbot-close");
+const chatbotForm = document.getElementById("chatbot-form");
+const chatbotInput = document.getElementById("chatbot-input");
+const chatbotMessages = document.getElementById("chatbot-messages");
+
+// Open chat window
+chatbotToggleBtn.addEventListener("click", () => {
+    chatbotWindow.classList.remove("hidden");
+    chatbotToggleBtn.classList.add("hidden");
+    chatbotInput.focus();
+});
+
+// Close chat window
+chatbotCloseBtn.addEventListener("click", () => {
+    chatbotWindow.classList.add("hidden");
+    chatbotToggleBtn.classList.remove("hidden");
+});
+
+// Add a message bubble to the chat UI
+function appendMessage(text, sender) {
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("message");
+    msgDiv.classList.add(sender === "user" ? "user-message" : "ai-message");
+    msgDiv.textContent = text;
+    chatbotMessages.appendChild(msgDiv);
+    
+    // Auto-scroll to the bottom
+    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+}
+
+// Handle form submission
+chatbotForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    
+    const userText = chatbotInput.value.trim();
+    if (!userText) return;
+
+    // Display user's message
+    appendMessage(userText, "user");
+    chatbotInput.value = "";
+    chatbotInput.disabled = true;
+
+    // Display a temporary loading message
+    const loadingId = "loading-" + Date.now();
+    const loadingDiv = document.createElement("div");
+    loadingDiv.classList.add("message", "ai-message");
+    loadingDiv.id = loadingId;
+    loadingDiv.innerHTML = "<em>Thinking...</em>";
+    chatbotMessages.appendChild(loadingDiv);
+    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+
+    // Send to Python FastAPI engine
+    try {
+        const response = await fetch("https://inventory-stock-manager-ai.onrender.com/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: userText })
+        });
+        
+        const data = await response.json();
+        
+        // Remove loading text and show real response
+        document.getElementById(loadingId).remove();
+        appendMessage(data.reply, "ai");
+        
+        // If the AI successfully sold something, refresh the dashboard tables!
+        if (data.reply.toLowerCase().includes("success")) {
+            fetchProducts();
+        }
+        
+    } catch (error) {
+        console.error("AI Error:", error);
+        document.getElementById(loadingId).remove();
+        appendMessage("Error: Could not connect to the AI engine. Make sure the Python server is running.", "ai");
+    } finally {
+        chatbotInput.disabled = false;
+        chatbotInput.focus();
+    }
+});

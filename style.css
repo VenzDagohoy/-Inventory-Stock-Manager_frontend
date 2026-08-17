@@ -19,7 +19,6 @@
     --text-muted: #7f8c8d;
     --border: #e1e5ea;
 }
-
 body {
     /* Sets global font, background, and text colors */
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -28,14 +27,12 @@ body {
     margin: 0;
     padding: 0;
 }
-
 .container {
     /* Limit max width and centers main layout */
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
 }
-
 .main-header {
     /* Creates a flexible top navigation bar */
     display: flex;
@@ -48,7 +45,6 @@ body {
     margin-bottom: 25px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
-
 .main-header .logo {
     /* Sizes and aligns the header logo and icon */
     font-size: 24px;
@@ -57,7 +53,6 @@ body {
     align-items: center;
     gap: 10px;
 }
-
 .stats-row {
     /* Arranges statistic cards in a two column grid */
     display: grid;
@@ -65,7 +60,6 @@ body {
     gap: 20px;
     margin-bottom: 25px;
 }
-
 .stat-card {
     /* Style individual stat cards with background and border */
     background: var(--surface);
@@ -74,7 +68,6 @@ body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     border-left: 5px solid var(--secondary);
 }
-
 .stat-card h3 {
     /* Formats statistic card titles */
     margin: 0 0 10px 0;
@@ -83,7 +76,6 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
-
 .stat-value {
     /* Enlarges the statistic numbers */
     margin: 0;
@@ -91,7 +83,6 @@ body {
     font-weight: bold;
     color: var(--primary);
 }
-
 .layout-grid {
     /* Sets up a two column layout for forms and tables */
     display: grid;
@@ -99,7 +90,6 @@ body {
     gap: 25px;
     align-items: start;
 }
-
 .card {
     /* Adds background and padding to content boxes */
     background: var(--surface);
@@ -108,7 +98,6 @@ body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     margin-bottom: 20px;
 }
-
 h2 {
     /* Styles section headings with bottom borders */
     margin-top: 0;
@@ -118,23 +107,19 @@ h2 {
     padding-bottom: 15px;
     margin-bottom: 20px;
 }
-
-.form-group { 
+.form-group {
     /* Adds spacing below form input groups */
-    margin-bottom: 15px; 
+    margin-bottom: 15px;
 }
-
-.row-group { 
+.row-group {
     /* Places form elements side by side */
-    display: flex; 
-    gap: 15px; 
+    display: flex;
+    gap: 15px;
 }
-
-.input-half { 
+.input-half {
     /* Makes form inputs share equal width */
-    flex: 1; 
+    flex: 1;
 }
-
 label {
     /* Formats form labels with bold text */
     display: block;
@@ -143,10 +128,9 @@ label {
     font-size: 14.4px;
     color: var(--text-main);
 }
-
-input[type="text"], 
-input[type="number"], 
-input[type="email"], 
+input[type="text"],
+input[type="number"],
+input[type="email"],
 input[type="password"] {
     /* Styles input fields with padding and borders */
     width: 100%;
@@ -157,13 +141,11 @@ input[type="password"] {
     transition: border-color 0.2s;
     box-sizing: border-box;
 }
-
 input:focus {
     /* Highlights input borders when active */
     outline: none;
     border-color: var(--secondary);
 }
-
 button {
     /* Sets base styles for all buttons */
     padding: 10px 16px;
@@ -174,102 +156,72 @@ button {
     cursor: pointer;
     transition: all 0.2s;
 }
-
-button:disabled { 
+button:disabled {
     /* Disable button and changes cursor */
-    opacity: 0.5; 
-    cursor: not-allowed; 
+    opacity: 0.5;
+    cursor: not-allowed;
 }
-
 /* Primary blue buttons (Add, Search, Login, Register) */
-.btn-add-product,
-.btn-search,
-.btn-login-submit,
-.btn-register-submit {
+.btn-add-product, .btn-search, .btn-login-submit, .btn-register-submit {
     background-color: var(--secondary);
     color: white;
 }
-
-.btn-add-product:hover:not(:disabled),
-.btn-search:hover:not(:disabled),
-.btn-login-submit:hover:not(:disabled),
-.btn-register-submit:hover:not(:disabled) {
+.btn-add-product:hover:not(:disabled), .btn-search:hover:not(:disabled), .btn-login-submit:hover:not(:disabled), .btn-register-submit:hover:not(:disabled) {
     background-color: var(--secondary-hover);
 }
-
 /* Edit action buttons (Yellow theme) */
-.btn-edit-product,
-.btn-save-edit {
+.btn-edit-product, .btn-save-edit {
     background-color: var(--warning);
     color: white;
 }
-
-.btn-edit-product:hover:not(:disabled),
-.btn-save-edit:hover:not(:disabled) {
+.btn-edit-product:hover:not(:disabled), .btn-save-edit:hover:not(:disabled) {
     background-color: var(--warning-hover);
 }
-
 /* Danger action buttons */
-.btn-reset-history,
-.btn-delete-product {
+.btn-reset-history, .btn-delete-product {
     background-color: var(--danger);
     color: white;
 }
-
-.btn-reset-history:hover:not(:disabled),
-.btn-delete-product:hover:not(:disabled) {
+.btn-reset-history:hover:not(:disabled), .btn-delete-product:hover:not(:disabled) {
     background-color: var(--danger-hover);
 }
-
 /* Neutral action buttons */
-.btn-logout,
-.btn-cancel-edit,
-.btn-reset-search {
+.btn-logout, .btn-cancel-edit, .btn-reset-search {
     background-color: var(--neutral);
     color: white;
 }
-
-.btn-logout:hover:not(:disabled),
-.btn-cancel-edit:hover:not(:disabled),
-.btn-reset-search:hover:not(:disabled) {
+.btn-logout:hover:not(:disabled), .btn-cancel-edit:hover:not(:disabled), .btn-reset-search:hover:not(:disabled) {
     background-color: var(--neutral-hover);
 }
-
 /* Success action buttons */
 .btn-sell-product {
     background-color: var(--success);
     color: white;
 }
-
 .btn-sell-product:hover:not(:disabled) {
     background-color: var(--success-hover);
 }
-
-.full-width { 
+.full-width {
     /* Makes elements span the full width */
-    width: 100%; 
-    padding: 12px; 
-    font-size: 16px; 
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
 }
-
-.btn-group { 
+.btn-group {
     /* Arranges button groups side by side */
-    display: flex; 
-    gap: 10px; 
+    display: flex;
+    gap: 10px;
 }
-
-.table-responsive { 
+.table-responsive {
     /* Enables horizontal scrolling for tables */
-    overflow-x: auto; 
+    overflow-x: auto;
 }
-
 table {
     /* Makes tables full width with collapsed borders */
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
 }
-
 th, td {
     /* Adds padding and borders to table cells */
     padding: 15px;
@@ -277,7 +229,6 @@ th, td {
     border-bottom: 1px solid var(--border);
     vertical-align: middle;
 }
-
 th {
     /* Styles table header cells */
     background-color: var(--background);
@@ -287,21 +238,18 @@ th {
     font-size: 12.8px;
     letter-spacing: 0.5px;
 }
-
-.product-name { 
+.product-name {
     /* Styles product name text */
-    font-weight: bold; 
-    font-size: 17.6px; 
-    color: var(--text-main); 
+    font-weight: bold;
+    font-size: 17.6px;
+    color: var(--text-main);
 }
-
-.product-id { 
+.product-id {
     /* Styles product id and price subtitles */
-    font-size: 13.6px; 
-    color: var(--text-muted); 
-    margin-top: 4px; 
+    font-size: 13.6px;
+    color: var(--text-muted);
+    margin-top: 4px;
 }
-
 .badge {
     /* Styles status badges with rounded corners */
     padding: 5px 10px;
@@ -309,95 +257,78 @@ th {
     font-size: 13.6px;
     font-weight: bold;
 }
-
-.in-stock { 
+.in-stock {
     /* Colors in stock badges green */
-    background: #e8f8f5; 
-    color: var(--success); 
+    background: #e8f8f5;
+    color: var(--success);
 }
-
-.out-of-stock { 
+.out-of-stock {
     /* Colors out of stock badges red */
-    background: #fdedec; 
-    color: var(--danger); 
+    background: #fdedec;
+    color: var(--danger);
 }
-
-.text-success { 
+.text-success {
     /* Forces success text color */
-    color: var(--success) !important; 
+    color: var(--success) !important;
 }
-
-.font-weight-bold { 
+.font-weight-bold {
     /* Makes text bold */
-    font-weight: bold; 
+    font-weight: bold;
 }
-
-.text-right { 
+.text-right {
     /* Aligns text to the right */
-    text-align: right; 
+    text-align: right;
 }
-
-.text-center { 
+.text-center {
     /* Centers text alignment */
-    text-align: center; 
+    text-align: center;
 }
-
-.action-btn { 
+.action-btn {
     /* Sizes table action buttons */
-    padding: 6px 12px; 
-    font-size: 12.8px; 
-    margin-left: 4px; 
+    padding: 6px 12px;
+    font-size: 12.8px;
+    margin-left: 4px;
 }
-
-.search-row { 
+.search-row {
     /* Arranges search inputs and buttons */
-    display: flex; 
-    gap: 10px; 
+    display: flex;
+    gap: 10px;
 }
-
-.search-row.no-margin { 
+.search-row.no-margin {
     /* Removes bottom margin from search rows */
-    margin-bottom: 0; 
+    margin-bottom: 0;
 }
-
-.search-row input { 
+.search-row input {
     /* Makes search inputs fill available space */
-    flex: 1; 
+    flex: 1;
 }
-
-#edit-card { 
+#edit-card {
     /* Adds yellow left border to edit card */
-    border-left: 5px solid var(--warning); 
+    border-left: 5px solid var(--warning);
 }
-
-.message { 
+.message {
     /* Styles status messages */
-    margin-top: 12px; 
-    font-weight: bold; 
+    margin-top: 12px;
+    font-weight: bold;
     font-size: 15.2px;
 }
-
-.error { 
+.error {
     /* Colors error messages red */
-    color: var(--danger); 
+    color: var(--danger);
 }
-
-.success { 
+.success {
     /* Colors success messages green */
-    color: var(--success); 
+    color: var(--success);
 }
-
 #logout-btn {
     /* Adds bottom margin to logout button */
     margin-bottom: 20px;
 }
-
 .auth-title {
     /* Centers authentication page titles */
     text-align: center;
     margin-bottom: 20px;
 }
-
 .auth-loading-text {
     /* Hides and formats authentication loading text */
     display: none;
@@ -406,60 +337,50 @@ th {
     font-weight: bold;
     color: var(--text-muted);
 }
-
 .auth-link-container {
     /* Centers authentication footer links */
     text-align: center;
     margin-top: 20px;
     font-size: 14.4px;
 }
-
 .auth-link-anchor {
     /* Styles authentication links */
     color: var(--secondary);
     text-decoration: none;
     font-weight: 600;
 }
-
 .auth-link-anchor:hover {
     /* Underlines auth links on hover */
     text-decoration: underline;
 }
-
 @media (max-width: 900px) {
     /* Stacks layout columns on smaller screens */
-    .layout-grid { 
-        grid-template-columns: 1fr; 
+    .layout-grid {
+        grid-template-columns: 1fr;
     }
-    .stats-row { 
-        grid-template-columns: 1fr; 
+    .stats-row {
+        grid-template-columns: 1fr;
     }
 }
-
-.auth-container { 
+.auth-container {
     /* Constrains authentication container width and margin */
-    max-width: 450px; 
-    margin-top: 10vh; 
+    max-width: 450px;
+    margin-top: 10vh;
 }
-
-.auth-container .card { 
+.auth-container .card {
     /* Adjusts padding for authentication cards */
-    padding: 40px 30px; 
+    padding: 40px 30px;
 }
-
-.hidden { 
+.hidden {
     /* Hides elements completely */
-    display: none !important; 
+    display: none !important;
 }
-
 .nav-tabs {
     /* Arranges navigation tabs horizontally */
     display: flex;
     gap: 15px;
 }
-
-.btn-tab-dashboard,
-.btn-tab-history {
+.btn-tab-dashboard, .btn-tab-history {
     /* Styles navigation tab buttons */
     background: transparent;
     color: rgba(255, 255, 255, 0.7);
@@ -470,23 +391,154 @@ th {
     border-radius: 4px;
     transition: background 0.2s, color 0.2s;
 }
-
-.btn-tab-dashboard:hover,
-.btn-tab-history:hover {
+.btn-tab-dashboard:hover, .btn-tab-history:hover {
     /* Lightens tab buttons on hover */
     background: rgba(255, 255, 255, 0.1);
     color: white;
 }
-
-.btn-tab-dashboard.active,
-.btn-tab-history.active {
+.btn-tab-dashboard.active, .btn-tab-history.active {
     /* Highlights active navigation tabs */
     background: rgba(255, 255, 255, 0.2);
     color: white;
     font-weight: bold;
 }
-
 .reset-card {
     /* Adds red left border to reset cards */
     border-left: 5px solid var(--danger) !important;
+}
+
+/* =========================================================
+   AI Chatbot UI
+   ========================================================= */
+
+.chatbot-toggle-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: var(--secondary);
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    cursor: pointer;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.chatbot-toggle-btn:hover {
+    background-color: var(--secondary-hover);
+    transform: scale(1.05);
+}
+
+.chatbot-window {
+    position: fixed;
+    bottom: 90px;
+    right: 30px;
+    width: 350px;
+    height: 500px;
+    background-color: var(--surface);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.chatbot-header {
+    background-color: var(--primary);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chatbot-header h3 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.chatbot-close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.chatbot-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-color: var(--background);
+}
+
+.chatbot-messages .message {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14.4px;
+    line-height: 1.4;
+}
+
+.ai-message {
+    background-color: white;
+    color: var(--text-main);
+    align-self: flex-start;
+    border-bottom-left-radius: 2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.user-message {
+    background-color: var(--secondary);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.chatbot-input-area {
+    display: flex;
+    padding: 15px;
+    background-color: white;
+    border-top: 1px solid var(--border);
+}
+
+.chatbot-input-area input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    outline: none;
+    font-size: 14.4px;
+}
+
+.chatbot-input-area input:focus {
+    border-color: var(--secondary);
+}
+
+.chatbot-send-btn {
+    background: none;
+    border: none;
+    color: var(--secondary);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0 10px;
+    margin-left: 5px;
+}
+
+.chatbot-send-btn:hover {
+    color: var(--secondary-hover);
 }
