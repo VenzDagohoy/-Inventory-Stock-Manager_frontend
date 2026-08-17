@@ -143,7 +143,7 @@ function renderTable(products) {
         row.innerHTML = `
             <td>                 
                 <div class="product-name">${product.name}</div>                 
-                <div class="product-id">ID: #${product.id} • Php ${Number(product.price).toFixed(2)}</div>             
+                <div class="product-id">ID: #${product.id}   Php ${Number(product.price).toFixed(2)}</div>             
             </td>             
             <td><span class="badge ${stockClass}">${product.stock}</span></td>             
             <td><strong>${soldAmount}</strong></td>             
@@ -294,7 +294,7 @@ window.deleteProduct = async function(id) {
 // History function
 async function fetchHistory() {
     const historyList = document.getElementById("history-list");
-    historyList.innerHTML = `<tr><td colspan="4" class="text-center">Loading history...</td></tr>`;
+    historyList.innerHTML = `<tr><td colspan="5" class="text-center">Loading history...</td></tr>`;
     
     try {
         const response = await fetch(`${API_URL}/history`, {
@@ -306,7 +306,7 @@ async function fetchHistory() {
         const data = await response.json();
         
         if (!data.history || data.history.length === 0) {
-            historyList.innerHTML = `<tr><td colspan="4" class="text-center">No history records found.</td></tr>`;
+            historyList.innerHTML = `<tr><td colspan="5" class="text-center">No history records found.</td></tr>`;
             return;
         }
         historyList.innerHTML = "";
@@ -314,17 +314,29 @@ async function fetchHistory() {
             const dateObj = new Date(record.record_date);
             const timeObj = new Date(record.created_at);
             
+            let detailsList = "<ul style='margin: 0; padding-left: 15px; font-size: 13.6px; color: var(--text-main);'>";
+            if (record.items_sold_details) {
+                const items = JSON.parse(record.items_sold_details);
+                items.forEach(item => {
+                    detailsList += `<li>${item.sold}x <strong>${item.name}</strong> (Php ${Number(item.price).toFixed(2)} each)</li>`;
+                });
+            } else {
+                detailsList += "<li><em style='color: var(--text-muted);'>No details available (Old record)</em></li>";
+            }
+            detailsList += "</ul>";
+            
             const row = document.createElement("tr");
             row.innerHTML = `                 
                 <td><strong>${dateObj.toLocaleDateString()}</strong></td>                 
                 <td>${record.total_sold} items</td>                 
+                <td>${detailsList}</td>
                 <td class="text-success font-weight-bold">Php ${Number(record.total_earnings).toFixed(2)}</td>                 
                 <td><span class="product-id">${timeObj.toLocaleTimeString()}</span></td>             
             `;
             historyList.appendChild(row);
         });
     } catch (error) {
-        historyList.innerHTML = `<tr><td colspan="4" class="text-center error">Error loading history</td></tr>`;
+        historyList.innerHTML = `<tr><td colspan="5" class="text-center error">Error loading history</td></tr>`;
     }
 }
 

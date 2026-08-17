@@ -176,7 +176,7 @@ button {
 }
 
 button:disabled { 
-    /* Dims disabled buttons and changes cursor */
+    /* Disable button and changes cursor */
     opacity: 0.5; 
     cursor: not-allowed; 
 }
