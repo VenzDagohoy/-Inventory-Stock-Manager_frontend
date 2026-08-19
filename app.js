@@ -421,7 +421,14 @@ chatbotForm.addEventListener("submit", async (e) => {
         const loader = document.getElementById(loadingId);
         if (loader) loader.remove();
         
-        appendMessage(data.reply, "ai");
+        // NEW: Check if the server crashed and output the error message
+        if (!response.ok) {
+            appendMessage("Server Error: " + (data.detail || "Connection failed."), "ai");
+            return;
+        }
+        
+        // Fallback added to guarantee a string is always appended
+        appendMessage(data.reply || "I couldn't process that request.", "ai");
         
         if (data.reply && data.reply.toLowerCase().includes("success")) {
             fetchProducts();
