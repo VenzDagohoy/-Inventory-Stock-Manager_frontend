@@ -39,7 +39,7 @@ window.switchTab = function(tabName) {
     } else {
         fetchProducts();
     }
-};
+}
 
 // View variables
 const productForm = document.getElementById("product-form");
@@ -47,6 +47,7 @@ const productList = document.getElementById("product-list");
 const productTable = document.getElementById("product-table");
 const loadingDiv = document.getElementById("loading");
 const formMessage = document.getElementById("form-message");
+
 const editCard = document.getElementById("edit-card");
 const editForm = document.getElementById("edit-form");
 
@@ -108,7 +109,7 @@ window.performSearch = async function() {
     } catch (error) {
         console.error("Error searching by Name:", error);
     }
-};
+}
 
 function renderTable(products) {
     loadingDiv.style.display = "none";
@@ -119,7 +120,7 @@ function renderTable(products) {
     let overallEarnings = 0;
     
     if (!products || products.length === 0) {
-        productList.innerHTML = `<tr><td colspan="5" class="text-center">No products found.</td></tr>`;
+        productList.innerHTML = `<tr><td colspan="6" class="text-center">No products found.</td></tr>`;
         document.getElementById("overall-sold").textContent = 0;
         document.getElementById("overall-earnings").textContent = "Php 0.00";
         return;
@@ -137,18 +138,19 @@ function renderTable(products) {
         const stockClass = product.stock <= 0 ? "out-of-stock" : "in-stock";
         
         row.innerHTML = `
-            <td>                 
-                <div class="product-name">${product.name}</div>                 
-                <div class="product-id">ID: #${product.id}   Php ${Number(product.price).toFixed(2)}</div>             
-            </td>             
-            <td><span class="badge ${stockClass}">${product.stock}</span></td>             
-            <td><strong>${soldAmount}</strong></td>             
-            <td class="text-success font-weight-bold">Php ${productEarnings.toFixed(2)}</td>             
-            <td class="text-right">                 
-                <button class="btn-sell-product action-btn" ${sellDisabled} onclick="sellProduct(${product.id})">Sell</button>                 
-                <button class="btn-edit-product action-btn" onclick="openEditForm(${product.id}, '${product.name}', ${product.price}, ${product.stock})">Edit</button>                 
-                <button class="btn-delete-product action-btn" onclick="deleteProduct(${product.id})">Del</button>             
-            </td>         
+            <td>
+                <div class="product-name">${product.name}</div>
+                <div class="product-id">ID: #${product.id}</div>
+            </td>
+            <td style="white-space: nowrap;"><strong>Php ${Number(product.price).toFixed(2)}</strong></td>
+            <td><span class="badge ${stockClass}">${product.stock}</span></td>
+            <td><strong>${soldAmount}</strong></td>
+            <td class="text-success font-weight-bold" style="white-space: nowrap;">Php ${productEarnings.toFixed(2)}</td>
+            <td class="text-right" style="white-space: nowrap;">
+                <button class="btn-sell-product action-btn" ${sellDisabled} onclick="sellProduct(${product.id})">Sell</button>
+                <button class="btn-edit-product action-btn" onclick="openEditForm(${product.id}, '${product.name}', ${product.price}, ${product.stock})">Edit</button>
+                <button class="btn-delete-product action-btn" onclick="deleteProduct(${product.id})">Del</button>
+            </td>
         `;
         productList.appendChild(row);
     });
@@ -160,12 +162,15 @@ function renderTable(products) {
 // Reset daily logic
 document.getElementById("reset-daily-btn").addEventListener("click", async () => {
     if (!confirm("Are you sure? This will save your current totals to History and reset today's sold numbers back to 0.")) return;
+
     try {
         const response = await fetch(`${API_URL}/products/reset-daily`, {
             method: "POST",
             headers: { "Authorization": `Bearer ${token}` }
         });
+
         if (handleUnauthorized(response)) return;
+
         const result = await response.json();
         alert(result.message);
         
@@ -180,6 +185,7 @@ document.getElementById("reset-daily-btn").addEventListener("click", async () =>
 // Create product form
 productForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+
     const name = document.getElementById("name").value;
     const price = Number(document.getElementById("price").value);
     const stock = Number(document.getElementById("stock").value);
@@ -192,6 +198,7 @@ productForm.addEventListener("submit", async (e) => {
         });
         
         if (handleUnauthorized(response)) return;
+
         const result = await response.json();
         
         if (!response.ok) {
@@ -204,6 +211,7 @@ productForm.addEventListener("submit", async (e) => {
         formMessage.className = "message success";
         productForm.reset();
         fetchProducts();
+
     } catch (error) {
         formMessage.textContent = "Server error occurred.";
         formMessage.className = "message error";
@@ -230,7 +238,7 @@ window.sellProduct = async function(id) {
     } catch (error) {
         console.error("Error selling product:", error);
     }
-};
+}
 
 window.openEditForm = function(id, name, price, stock) {
     editCard.classList.remove("hidden");
@@ -238,16 +246,18 @@ window.openEditForm = function(id, name, price, stock) {
     document.getElementById("edit-name").value = name;
     document.getElementById("edit-price").value = price;
     document.getElementById("edit-stock").value = stock;
+
     window.scrollTo({ top: 0, behavior: "smooth" });
-};
+}
 
 window.cancelEdit = function() {
     editCard.classList.add("hidden"); 
     editForm.reset(); 
-};
+}
 
 editForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+
     const id = document.getElementById("edit-id").value;
     const name = document.getElementById("edit-name").value;
     const price = Number(document.getElementById("edit-price").value);
@@ -259,14 +269,19 @@ editForm.addEventListener("submit", async (e) => {
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
             body: JSON.stringify({ name, price, stock })
         });
+
         if (handleUnauthorized(response)) return;
+
         const result = await response.json();
+
         if (!response.ok) {
             alert(result.message);
             return;
         }
+
         cancelEdit();
         fetchProducts(); 
+
     } catch (error) {
         console.error("Error updating product:", error);
     }
@@ -274,17 +289,20 @@ editForm.addEventListener("submit", async (e) => {
 
 window.deleteProduct = async function(id) {
     if (!confirm("Are you sure you want to delete this product?")) return;
+
     try {
         const response = await fetch(`${API_URL}/products/${id}`, {
             method: "DELETE",
             headers: { "Authorization": `Bearer ${token}` }
         });
+
         if (handleUnauthorized(response)) return;
+
         if (response.ok) fetchProducts();
     } catch (error) {
         console.error("Error deleting product:", error);
     }
-};
+}
 
 // History function
 async function fetchHistory() {
@@ -297,14 +315,18 @@ async function fetchHistory() {
         });
         
         if (handleUnauthorized(response)) return;
+
         if (!response.ok) throw new Error("Failed to fetch history");
+
         const data = await response.json();
         
         if (!data.history || data.history.length === 0) {
             historyList.innerHTML = `<tr><td colspan="5" class="text-center">No history records found.</td></tr>`;
             return;
         }
+
         historyList.innerHTML = "";
+
         data.history.forEach(record => {
             const dateObj = new Date(record.record_date);
             const timeObj = new Date(record.created_at);
@@ -321,15 +343,16 @@ async function fetchHistory() {
             detailsList += "</ul>";
             
             const row = document.createElement("tr");
-            row.innerHTML = `                 
-                <td><strong>${dateObj.toLocaleDateString()}</strong></td>                 
-                <td>${record.total_sold} items</td>                 
+            row.innerHTML = `
+                <td><strong>${dateObj.toLocaleDateString()}</strong></td>
+                <td>${record.total_sold} items</td>
                 <td>${detailsList}</td>
-                <td class="text-success font-weight-bold">Php ${Number(record.total_earnings).toFixed(2)}</td>                 
-                <td><span class="product-id">${timeObj.toLocaleTimeString()}</span></td>             
+                <td class="text-success font-weight-bold">Php ${Number(record.total_earnings).toFixed(2)}</td>
+                <td><span class="product-id">${timeObj.toLocaleTimeString()}</span></td>
             `;
             historyList.appendChild(row);
         });
+
     } catch (error) {
         historyList.innerHTML = `<tr><td colspan="5" class="text-center error">Error loading history</td></tr>`;
     }
@@ -337,7 +360,6 @@ async function fetchHistory() {
 
 // Initial boot
 fetchProducts();
-
 
 // ---------------------------------------------------------
 // AI Chatbot UI Integration (User-Scoped)
