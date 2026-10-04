@@ -331,24 +331,33 @@ async function fetchHistory() {
             const dateObj = new Date(record.record_date);
             const timeObj = new Date(record.created_at);
             
-            let detailsList = "<ul style='margin: 0; padding-left: 15px; font-size: 13.6px; color: var(--text-main);'>";
+            // Dropdown accordion with controlled max-width to keep table layout balanced
+            let detailsList = "<details style='cursor: pointer; max-width: 400px;'>";
+            detailsList += `<summary style='font-weight: 600; color: var(--secondary); outline: none;'>View ${record.total_sold} items breakdown</summary>`;
+            detailsList += "<div style='display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; background-color: var(--background); padding: 12px; border-radius: 6px; border: 1px solid var(--border);'>";
+            
             if (record.items_sold_details) {
                 const items = JSON.parse(record.items_sold_details);
                 items.forEach(item => {
-                    detailsList += `<li>${item.sold}x <strong>${item.name}</strong> (Php ${Number(item.price).toFixed(2)} each)</li>`;
+                    detailsList += `
+                        <div style="background-color: var(--surface); border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; font-size: 12.8px; display: inline-flex; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+                            <strong style="color: var(--secondary); margin-right: 6px;">${item.sold}x</strong> 
+                            <span style="font-weight: 600; color: var(--text-main); margin-right: 6px;">${item.name}</span> 
+                            <span style="color: var(--text-muted);">@ Php ${Number(item.price).toFixed(2)}</span>
+                        </div>`;
                 });
             } else {
-                detailsList += "<li><em style='color: var(--text-muted);'>No details available (Old record)</em></li>";
+                detailsList += "<span style='color: var(--text-muted); font-style: italic;'>No details available (Old record)</span>";
             }
-            detailsList += "</ul>";
+            detailsList += "</div></details>";
             
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td><strong>${dateObj.toLocaleDateString()}</strong></td>
-                <td>${record.total_sold} items</td>
+                <td style="white-space: nowrap;"><strong>${dateObj.toLocaleDateString()}</strong></td>
+                <td style="white-space: nowrap;">${record.total_sold} items</td>
                 <td>${detailsList}</td>
-                <td class="text-success font-weight-bold">Php ${Number(record.total_earnings).toFixed(2)}</td>
-                <td><span class="product-id">${timeObj.toLocaleTimeString()}</span></td>
+                <td class="text-success font-weight-bold" style="white-space: nowrap;">Php ${Number(record.total_earnings).toFixed(2)}</td>
+                <td style="white-space: nowrap;"><span class="product-id">${timeObj.toLocaleTimeString()}</span></td>
             `;
             historyList.appendChild(row);
         });
@@ -443,13 +452,11 @@ chatbotForm.addEventListener("submit", async (e) => {
         const loader = document.getElementById(loadingId);
         if (loader) loader.remove();
         
-        // NEW: Check if the server crashed and output the error message
         if (!response.ok) {
             appendMessage("Server Error: " + (data.detail || "Connection failed."), "ai");
             return;
         }
         
-        // Fallback added to guarantee a string is always appended
         appendMessage(data.reply || "I couldn't process that request.", "ai");
         
         if (data.reply && data.reply.toLowerCase().includes("success")) {
