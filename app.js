@@ -331,7 +331,6 @@ async function fetchHistory() {
             const dateObj = new Date(record.record_date);
             const timeObj = new Date(record.created_at);
             
-            // Dropdown accordion with controlled max-width to keep table layout balanced
             let detailsList = "<details style='cursor: pointer; max-width: 400px;'>";
             detailsList += `<summary style='font-weight: 600; color: var(--secondary); outline: none;'>View ${record.total_sold} items breakdown</summary>`;
             detailsList += "<div style='display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; background-color: var(--background); padding: 12px; border-radius: 6px; border: 1px solid var(--border);'>";
@@ -392,11 +391,31 @@ chatbotCloseBtn.addEventListener("click", () => {
     chatbotToggleBtn.classList.remove("hidden");
 });
 
+// Helper to format AI markdown into clean HTML
+function formatAiMessage(text) {
+    let formatted = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+        
+    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    formatted = formatted.replace(/\* /g, '<br>• ');
+    formatted = formatted.replace(/\n/g, '<br>');
+    
+    return formatted;
+}
+
 function appendMessage(text, sender) {
     const msgDiv = document.createElement("div");
     msgDiv.classList.add("message");
     msgDiv.classList.add(sender === "user" ? "user-message" : "ai-message");
-    msgDiv.textContent = text;
+    
+    if (sender === "ai") {
+        msgDiv.innerHTML = formatAiMessage(text);
+    } else {
+        msgDiv.textContent = text;
+    }
+    
     chatbotMessages.appendChild(msgDiv);
     chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
 }
