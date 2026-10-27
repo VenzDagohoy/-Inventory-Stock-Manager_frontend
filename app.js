@@ -6,6 +6,33 @@ if (!token) {
     window.location.href = "./login.html";
 }
 
+// Helper to extract user payload (userId, role, name) from the session token
+function getUserPayloadFromToken() {
+    if (!token) return null;
+    try {
+        return JSON.parse(atob(token.split(".")[1]));
+    } catch (e) {
+        console.error("Failed to parse token payload:", e);
+        return null;
+    }
+}
+
+const currentUser = getUserPayloadFromToken();
+const currentRole = currentUser?.role || "owner";
+
+// Configure UI visibility based on Role (Owner vs Watcher)
+const roleBadge = document.getElementById("role-badge");
+if (roleBadge) {
+    roleBadge.textContent = currentRole === "owner" ? "Store Owner (Admin)" : "Store Watcher";
+}
+
+if (currentRole === "watcher") {
+    document.getElementById("add-product-card")?.classList.add("hidden");
+    document.getElementById("manage-watchers-card")?.classList.add("hidden");
+    document.getElementById("end-of-day-card")?.classList.add("hidden");
+    document.getElementById("tab-history")?.classList.add("hidden");
+}
+
 const logoutBtn = document.getElementById("logout-btn");
 if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
@@ -25,6 +52,8 @@ function handleUnauthorized(response) {
 
 // Navigation Logic
 window.switchTab = function(tabName) {
+    if (currentRole === "watcher" && tabName === "history") return;
+
     document.getElementById("dashboard-view").classList.add("hidden");
     document.getElementById("history-view").classList.add("hidden");
     
@@ -39,7 +68,7 @@ window.switchTab = function(tabName) {
     } else {
         fetchProducts();
     }
-}
+};
 
 // View variables
 const productForm = document.getElementById("product-form");
@@ -47,7 +76,6 @@ const productList = document.getElementById("product-list");
 const productTable = document.getElementById("product-table");
 const loadingDiv = document.getElementById("loading");
 const formMessage = document.getElementById("form-message");
-
 const editCard = document.getElementById("edit-card");
 const editForm = document.getElementById("edit-form");
 
@@ -109,11 +137,11 @@ window.performSearch = async function() {
     } catch (error) {
         console.error("Error searching by Name:", error);
     }
-}
+};
 
 function renderTable(products) {
     loadingDiv.style.display = "none";
-    productTable.style.display = "table";          
+    productTable.style.display = "table"; 
     productList.innerHTML = "";
     
     let overallSold = 0;
@@ -137,6 +165,12 @@ function renderTable(products) {
         const sellDisabled = product.stock <= 0 ? "disabled" : "";
         const stockClass = product.stock <= 0 ? "out-of-stock" : "in-stock";
         
+        // Only render Edit and Del buttons if logged in as Store Owner
+        const ownerActionButtons = currentRole === "owner" ? `
+            <button class="btn-edit-product action-btn" onclick="openEditForm(${product.id}, '${product.name}', ${product.price}, ${product.stock})">Edit</button>
+            <button class="btn-delete-product action-btn" onclick="deleteProduct(${product.id})">Del</button>
+        ` : "";
+
         row.innerHTML = `
             <td>
                 <div class="product-name">${product.name}</div>
@@ -148,8 +182,7 @@ function renderTable(products) {
             <td class="text-success font-weight-bold" style="white-space: nowrap;">Php ${productEarnings.toFixed(2)}</td>
             <td class="text-right" style="white-space: nowrap;">
                 <button class="btn-sell-product action-btn" ${sellDisabled} onclick="sellProduct(${product.id})">Sell</button>
-                <button class="btn-edit-product action-btn" onclick="openEditForm(${product.id}, '${product.name}', ${product.price}, ${product.stock})">Edit</button>
-                <button class="btn-delete-product action-btn" onclick="deleteProduct(${product.id})">Del</button>
+                ${ownerActionButtons}
             </td>
         `;
         productList.appendChild(row);
@@ -159,64 +192,144 @@ function renderTable(products) {
     document.getElementById("overall-earnings").textContent = "Php " + overallEarnings.toFixed(2);
 }
 
-// Reset daily logic
-document.getElementById("reset-daily-btn").addEventListener("click", async () => {
-    if (!confirm("Are you sure? This will save your current totals to History and reset today's sold numbers back to 0.")) return;
+// Reset daily logic (Owner Only)
+const resetDailyBtn = document.getElementById("reset-daily-btn");
+if (resetDailyBtn && currentRole === "owner") {
+    resetDailyBtn.addEventListener("click", async () => {
+        if (!confirm("Are you sure? This will save your current totals to History and reset today's sold numbers back to 0.")) return;
 
+        try {
+            const response = await fetch(`${API_URL}/products/reset-daily`, {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+
+            if (handleUnauthorized(response)) return;
+
+            const result = await response.json();
+            alert(result.message);
+            
+            if (response.ok) {
+                fetchProducts();
+            }
+        } catch (error) {
+            alert("Failed to reset daily stats.");
+        }
+    });
+}
+
+// Create product form (Owner Only)
+if (productForm && currentRole === "owner") {
+    productForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name = document.getElementById("name").value;
+        const price = Number(document.getElementById("price").value);
+        const stock = Number(document.getElementById("stock").value);
+        
+        try {
+            const response = await fetch(`${API_URL}/products`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+                body: JSON.stringify({ name, price, stock })
+            });
+            
+            if (handleUnauthorized(response)) return;
+            const result = await response.json();
+            
+            if (!response.ok) {
+                formMessage.textContent = result.message;
+                formMessage.className = "message error";
+                return;
+            }
+            
+            formMessage.textContent = "Product added successfully!";
+            formMessage.className = "message success";
+            productForm.reset();
+            fetchProducts();
+        } catch (error) {
+            formMessage.textContent = "Server error occurred.";
+            formMessage.className = "message error";
+        }
+    });
+}
+
+// Manage User Accounts - Watcher Creation & Listing (Owner Only)
+const watcherForm = document.getElementById("watcher-form");
+const watcherMessage = document.getElementById("watcher-message");
+const watcherList = document.getElementById("watcher-list");
+
+async function fetchWatchers() {
+    if (currentRole !== "owner" || !watcherList) return;
     try {
-        const response = await fetch(`${API_URL}/products/reset-daily`, {
-            method: "POST",
+        const response = await fetch(`${API_URL}/auth/watchers`, {
             headers: { "Authorization": `Bearer ${token}` }
         });
-
-        if (handleUnauthorized(response)) return;
-
-        const result = await response.json();
-        alert(result.message);
+        if (!response.ok) return;
+        const data = await response.json();
         
-        if (response.ok) {
-            fetchProducts();
-        }
-    } catch (error) {
-        alert("Failed to reset daily stats.");
-    }
-});
-
-// Create product form
-productForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const name = document.getElementById("name").value;
-    const price = Number(document.getElementById("price").value);
-    const stock = Number(document.getElementById("stock").value);
-    
-    try {
-        const response = await fetch(`${API_URL}/products`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-            body: JSON.stringify({ name, price, stock })
-        });
-        
-        if (handleUnauthorized(response)) return;
-
-        const result = await response.json();
-        
-        if (!response.ok) {
-            formMessage.textContent = result.message;
-            formMessage.className = "message error";
+        if (!data.watchers || data.watchers.length === 0) {
+            watcherList.innerHTML = `<p style="font-size: 13px; color: var(--text-muted);">No Store Watchers created yet.</p>`;
             return;
         }
-        
-        formMessage.textContent = "Product added successfully!";
-        formMessage.className = "message success";
-        productForm.reset();
-        fetchProducts();
 
-    } catch (error) {
-        formMessage.textContent = "Server error occurred.";
-        formMessage.className = "message error";
+        watcherList.innerHTML = data.watchers.map(w => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13.6px;">
+                <div>
+                    <strong>${w.name}</strong><br>
+                    <span style="color: var(--text-muted); font-size: 12px;">${w.email}</span>
+                </div>
+                <button class="btn-delete-product action-btn" onclick="deleteWatcherAccount(${w.id})">Remove</button>
+            </div>
+        `).join("");
+    } catch (e) {
+        console.error("Failed to load watchers:", e);
     }
-});
+}
+
+window.deleteWatcherAccount = async function(watcherId) {
+    if (!confirm("Remove this Store Watcher's access?")) return;
+    try {
+        const response = await fetch(`${API_URL}/auth/watchers/${watcherId}`, {
+            method: "DELETE",
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (response.ok) fetchWatchers();
+    } catch (e) {
+        console.error("Error deleting watcher:", e);
+    }
+};
+
+if (watcherForm && currentRole === "owner") {
+    watcherForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name = document.getElementById("watcher-name").value;
+        const email = document.getElementById("watcher-email").value;
+        const password = document.getElementById("watcher-password").value;
+
+        try {
+            const response = await fetch(`${API_URL}/auth/watchers`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+                body: JSON.stringify({ name, email, password })
+            });
+            const result = await response.json();
+
+            if (!response.ok) {
+                watcherMessage.textContent = result.message || "Failed to create watcher.";
+                watcherMessage.className = "message error";
+                return;
+            }
+
+            watcherMessage.textContent = "Watcher account created!";
+            watcherMessage.className = "message success";
+            watcherForm.reset();
+            fetchWatchers();
+        } catch (error) {
+            watcherMessage.textContent = "Server error occurred.";
+            watcherMessage.className = "message error";
+        }
+    });
+}
 
 window.sellProduct = async function(id) {
     try {
@@ -238,73 +351,67 @@ window.sellProduct = async function(id) {
     } catch (error) {
         console.error("Error selling product:", error);
     }
-}
+};
 
 window.openEditForm = function(id, name, price, stock) {
+    if (currentRole !== "owner") return;
     editCard.classList.remove("hidden");
     document.getElementById("edit-id").value = id;
     document.getElementById("edit-name").value = name;
     document.getElementById("edit-price").value = price;
     document.getElementById("edit-stock").value = stock;
-
     window.scrollTo({ top: 0, behavior: "smooth" });
-}
+};
 
 window.cancelEdit = function() {
     editCard.classList.add("hidden"); 
     editForm.reset(); 
+};
+
+if (editForm && currentRole === "owner") {
+    editForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = document.getElementById("edit-id").value;
+        const name = document.getElementById("edit-name").value;
+        const price = Number(document.getElementById("edit-price").value);
+        const stock = Number(document.getElementById("edit-stock").value);
+        
+        try {
+            const response = await fetch(`${API_URL}/products/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+                body: JSON.stringify({ name, price, stock })
+            });
+            if (handleUnauthorized(response)) return;
+            const result = await response.json();
+            if (!response.ok) {
+                alert(result.message);
+                return;
+            }
+            cancelEdit();
+            fetchProducts(); 
+        } catch (error) {
+            console.error("Error updating product:", error);
+        }
+    });
 }
 
-editForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const id = document.getElementById("edit-id").value;
-    const name = document.getElementById("edit-name").value;
-    const price = Number(document.getElementById("edit-price").value);
-    const stock = Number(document.getElementById("edit-stock").value);
-    
-    try {
-        const response = await fetch(`${API_URL}/products/${id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-            body: JSON.stringify({ name, price, stock })
-        });
-
-        if (handleUnauthorized(response)) return;
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            alert(result.message);
-            return;
-        }
-
-        cancelEdit();
-        fetchProducts(); 
-
-    } catch (error) {
-        console.error("Error updating product:", error);
-    }
-});
-
 window.deleteProduct = async function(id) {
+    if (currentRole !== "owner") return;
     if (!confirm("Are you sure you want to delete this product?")) return;
-
     try {
         const response = await fetch(`${API_URL}/products/${id}`, {
             method: "DELETE",
             headers: { "Authorization": `Bearer ${token}` }
         });
-
         if (handleUnauthorized(response)) return;
-
         if (response.ok) fetchProducts();
     } catch (error) {
         console.error("Error deleting product:", error);
     }
-}
+};
 
-// History function
+// History function (Owner Only)
 async function fetchHistory() {
     const historyList = document.getElementById("history-list");
     historyList.innerHTML = `<tr><td colspan="5" class="text-center">Loading history...</td></tr>`;
@@ -315,7 +422,6 @@ async function fetchHistory() {
         });
         
         if (handleUnauthorized(response)) return;
-
         if (!response.ok) throw new Error("Failed to fetch history");
 
         const data = await response.json();
@@ -360,7 +466,6 @@ async function fetchHistory() {
             `;
             historyList.appendChild(row);
         });
-
     } catch (error) {
         historyList.innerHTML = `<tr><td colspan="5" class="text-center error">Error loading history</td></tr>`;
     }
@@ -368,11 +473,13 @@ async function fetchHistory() {
 
 // Initial boot
 fetchProducts();
+if (currentRole === "owner") {
+    fetchWatchers();
+}
 
 // ---------------------------------------------------------
-// AI Chatbot UI Integration (User-Scoped)
+// AI Chatbot UI Integration (User-Scoped & Role-Scoped)
 // ---------------------------------------------------------
-
 const chatbotToggleBtn = document.getElementById("chatbot-toggle");
 const chatbotWindow = document.getElementById("chatbot-window");
 const chatbotCloseBtn = document.getElementById("chatbot-close");
@@ -391,7 +498,6 @@ chatbotCloseBtn.addEventListener("click", () => {
     chatbotToggleBtn.classList.remove("hidden");
 });
 
-// Helper to format AI markdown into clean HTML
 function formatAiMessage(text) {
     let formatted = text
         .replace(/&/g, "&amp;")
@@ -420,26 +526,14 @@ function appendMessage(text, sender) {
     chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
 }
 
-// Helper to extract userId from the session token
-function getUserIdFromToken() {
-    if (!token) return null;
-    try {
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        return payload.userId;
-    } catch (e) {
-        console.error("Failed to parse token payload:", e);
-        return null;
-    }
-}
-
 chatbotForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     
     const userText = chatbotInput.value.trim();
     if (!userText) return;
 
-    const currentUserId = getUserIdFromToken();
-    if (!currentUserId) {
+    const payload = getUserPayloadFromToken();
+    if (!payload || !payload.userId) {
         appendMessage("Session expired. Please log in again.", "ai");
         return;
     }
@@ -462,7 +556,8 @@ chatbotForm.addEventListener("submit", async (e) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
                 message: userText,
-                user_id: currentUserId 
+                user_id: payload.userId,
+                role: payload.role || "owner"
             })
         });
         

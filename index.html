@@ -8,13 +8,14 @@
 </head>
 <body>
     <div class="container">
-        
         <!-- Header -->
         <header class="main-header">
             <div class="logo">
                 <span class="icon">
-                    <img src="box.png" alt="Store Logo" style="height: 49px; width: auto;"></span> 
-                    StockTalk
+                    <img src="box.png" alt="Store Logo" style="height: 49px; width: auto;">
+                </span>
+                StockTalk
+                <span id="role-badge" class="badge in-stock" style="font-size: 12px; margin-left: 8px;"></span>
             </div>
             
             <div class="nav-tabs">
@@ -37,13 +38,13 @@
                 </div>
             </div>
             
-            <div class="layout-grid">
+            <div class="layout-grid" id="main-layout-grid">
                 <!-- Left column forms -->
                 <div class="left-panel">
                     
-                    <!-- Edit product form -->
+                    <!-- Edit product form (Owner Only) -->
                     <div class="card hidden" id="edit-card">
-                        <h2>Edit Product</h2>
+                        <h2>Update / Manage Supplies</h2>
                         <form id="edit-form">
                             <input type="hidden" id="edit-id">
                             <div class="form-group">
@@ -56,7 +57,7 @@
                                     <input type="number" id="edit-price" required step="0.01" min="0">
                                 </div>
                                 <div class="input-half">
-                                    <label for="edit-stock">Stock:</label>
+                                    <label for="edit-stock">Supply / Stock:</label>
                                     <input type="number" id="edit-stock" required step="1" min="0">
                                 </div>
                             </div>
@@ -67,13 +68,13 @@
                         </form>
                     </div>
 
-                    <!-- Add product form -->
-                    <div class="card">
+                    <!-- Add product form (Owner Only) -->
+                    <div class="card" id="add-product-card">
                         <h2>Add New Product</h2>
                         <form id="product-form">
                             <div class="form-group">
                                 <label for="name">Product Name:</label>
-                                <input type="text" id="name" required placeholder="e.g., Mechanical Keyboard">
+                                <input type="text" id="name" required placeholder="e.g., Kopiko Blanca">
                             </div>
                             <div class="form-group row-group">
                                 <div class="input-half">
@@ -90,8 +91,33 @@
                         <div id="form-message" class="message"></div>
                     </div>
 
-                    <!-- End of day action -->
-                    <div class="card reset-card">
+                    <!-- Manage User Accounts (Owner Only) -->
+                    <div class="card" id="manage-watchers-card">
+                        <h2>Manage User Accounts</h2>
+                        <p style="margin-top: 0; margin-bottom: 12px; color: var(--text-muted); font-size: 13.6px;">
+                            Create a Store Watcher login linked to your store inventory.
+                        </p>
+                        <form id="watcher-form">
+                            <div class="form-group">
+                                <label for="watcher-name">Watcher Name:</label>
+                                <input type="text" id="watcher-name" required placeholder="e.g., Bantay 1">
+                            </div>
+                            <div class="form-group">
+                                <label for="watcher-email">Watcher Email:</label>
+                                <input type="email" id="watcher-email" required placeholder="e.g., watcher@store.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="watcher-password">Password:</label>
+                                <input type="password" id="watcher-password" required minlength="8" placeholder="At least 8 characters">
+                            </div>
+                            <button type="submit" class="btn-add-product full-width">Create Watcher Account</button>
+                        </form>
+                        <div id="watcher-message" class="message"></div>
+                        <div id="watcher-list" style="margin-top: 15px;"></div>
+                    </div>
+
+                    <!-- End of day action (Owner Only) -->
+                    <div class="card reset-card" id="end-of-day-card">
                         <h2>End of Day</h2>
                         <p style="margin-top: 0; margin-bottom: 15px; color: var(--text-muted); font-size: 14.4px;">
                             Save today's totals to History and reset sold counters back to zero.
@@ -139,7 +165,7 @@
             </div>
         </div>
 
-        <!-- History view -->
+        <!-- History view (Owner Only) -->
         <div id="history-view" class="view-container hidden">
             <div class="card">
                 <h2>Daily Sales History</h2>
@@ -155,7 +181,6 @@
                             </tr>
                         </thead>
                         <tbody id="history-list">
-                            <!-- History data injected dynamically -->
                         </tbody>
                     </table>
                 </div>
@@ -174,12 +199,12 @@
             </div>
             <div id="chatbot-messages" class="chatbot-messages">
                 <div class="message ai-message">
-                    Hello! I'm your store assistant. You can ask me to check sales data or sell items for you.
+                    Hello! I'm your store assistant. You can ask me to check stock or sell items for you.
                 </div>
             </div>
             <form id="chatbot-form" class="chatbot-input-area">
                 <input type="text" id="chatbot-input" placeholder="Type a command..." required autocomplete="off">
-                <button type="submit" class="chatbot-send-btn">➤</button>
+                <button type="submit" class="chatbot-send-btn">&#10148;</button>
             </form>
         </div>
 
