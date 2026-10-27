@@ -30,6 +30,9 @@ if (currentRole === "watcher") {
     document.getElementById("manage-watchers-card")?.classList.add("hidden");
     document.getElementById("end-of-day-card")?.classList.add("hidden");
     document.getElementById("tab-history")?.classList.add("hidden");
+    
+    // Make the dashboard grid full-width for watchers
+    document.getElementById("main-layout-grid")?.classList.add("watcher-layout");
 }
 
 const logoutBtn = document.getElementById("logout-btn");
@@ -493,9 +496,7 @@ if (currentRole === "owner") {
     fetchWatchers();
 }
 
-// ---------------------------------------------------------
 // AI Chatbot UI Integration (User-Scoped & Role-Scoped)
-// ---------------------------------------------------------
 const chatbotToggleBtn = document.getElementById("chatbot-toggle");
 const chatbotWindow = document.getElementById("chatbot-window");
 const chatbotCloseBtn = document.getElementById("chatbot-close");

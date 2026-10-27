@@ -17,10 +17,14 @@
                 StockTalk
                 <span id="role-badge" class="badge in-stock" style="font-size: 12px; margin-left: 8px;"></span>
             </div>
-            
+                          
             <div class="nav-tabs">
                 <button id="tab-dashboard" class="btn-tab-dashboard active" onclick="switchTab('dashboard')">Dashboard</button>
                 <button id="tab-history" class="btn-tab-history" onclick="switchTab('history')">History</button>
+            </div>
+
+            <div>
+                <button id="logout-btn" class="btn-logout" style="padding: 8px 16px; font-size: 14px;">Log out</button>
             </div>
         </header>
 
@@ -37,11 +41,11 @@
                     <p id="overall-earnings" class="stat-value text-success">Php 0.00</p>
                 </div>
             </div>
-            
+                          
             <div class="layout-grid" id="main-layout-grid">
                 <!-- Left column forms -->
                 <div class="left-panel">
-                    
+                                         
                     <!-- Edit product form (Owner Only) -->
                     <div class="card hidden" id="edit-card">
                         <h2>Update / Manage Supplies</h2>
@@ -133,8 +137,6 @@
                         <button id="reset-daily-btn" class="btn-reset-history full-width">Reset & Save to History</button>
                     </div>
 
-                    <!-- Log out button -->
-                    <button id="logout-btn" class="btn-logout full-width">Log out</button>
                 </div>
 
                 <!-- Right column inventory data -->

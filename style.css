@@ -542,3 +542,8 @@ th {
 .chatbot-send-btn:hover {
     color: var(--secondary-hover);
 }
+
+/* Watcher Full-Width Layout Adjustment */
+.layout-grid.watcher-layout {
+    grid-template-columns: 1fr !important;
+}
