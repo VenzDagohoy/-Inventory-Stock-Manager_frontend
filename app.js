@@ -23,6 +23,7 @@ const currentRole = currentUser?.role || "owner";
 const roleBadge = document.getElementById("role-badge");
 if (roleBadge) {
     roleBadge.textContent = currentRole === "owner" ? "Store Owner (Admin)" : "Store Watcher";
+    roleBadge.className = currentRole === "owner" ? "owner-badge" : "watcher-badge";
 }
 
 if (currentRole === "watcher") {

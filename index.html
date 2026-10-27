@@ -8,23 +8,24 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
+        <!-- Refined Dark Header (Concept 2) -->
         <header class="main-header">
-            <div class="logo">
-                <span class="icon">
-                    <img src="box.png" alt="Store Logo" style="height: 49px; width: auto;">
-                </span>
-                StockTalk
-                <span id="role-badge" class="badge in-stock" style="font-size: 12px; margin-left: 8px;"></span>
+            <div class="main-header-left">
+                <div class="logo">
+                    <span class="icon">
+                        <img src="box.png" alt="Store Logo" style="height: 38px; width: auto;">
+                    </span>
+                    StockTalk
+                </div>
+                <span id="role-badge" class="badge"></span>
             </div>
                           
-            <div class="nav-tabs">
-                <button id="tab-dashboard" class="btn-tab-dashboard active" onclick="switchTab('dashboard')">Dashboard</button>
-                <button id="tab-history" class="btn-tab-history" onclick="switchTab('history')">History</button>
-            </div>
-
-            <div>
-                <button id="logout-btn" class="btn-logout" style="padding: 8px 16px; font-size: 14px;">Log out</button>
+            <div class="main-header-right">
+                <div class="nav-tabs">
+                    <button id="tab-dashboard" class="btn-tab-dashboard active" onclick="switchTab('dashboard')">Dashboard</button>
+                    <button id="tab-history" class="btn-tab-history" onclick="switchTab('history')">History</button>
+                </div>
+                <button id="logout-btn" class="btn-logout-header">Log out</button>
             </div>
         </header>
 
