@@ -1,4 +1,3 @@
-// const API_URL = "http://localhost:3000";
 const API_URL = "https://inventory-stock-manager-backend.onrender.com";
 
 const token = localStorage.getItem("accessToken");
@@ -165,7 +164,6 @@ function renderTable(products) {
         const sellDisabled = product.stock <= 0 ? "disabled" : "";
         const stockClass = product.stock <= 0 ? "out-of-stock" : "in-stock";
         
-        // Only render Edit and Del buttons if logged in as Store Owner
         const ownerActionButtons = currentRole === "owner" ? `
             <button class="btn-edit-product action-btn" onclick="openEditForm(${product.id}, '${product.name}', ${product.price}, ${product.stock})">Edit</button>
             <button class="btn-delete-product action-btn" onclick="deleteProduct(${product.id})">Del</button>
@@ -257,6 +255,7 @@ if (productForm && currentRole === "owner") {
 const watcherForm = document.getElementById("watcher-form");
 const watcherMessage = document.getElementById("watcher-message");
 const watcherList = document.getElementById("watcher-list");
+const watcherDropdown = document.getElementById("watcher-dropdown");
 
 async function fetchWatchers() {
     if (currentRole !== "owner" || !watcherList) return;
@@ -300,6 +299,12 @@ window.deleteWatcherAccount = async function(watcherId) {
 };
 
 if (watcherForm && currentRole === "owner") {
+    // Clear message instantly when typing
+    watcherForm.addEventListener("input", () => {
+        watcherMessage.textContent = "";
+        watcherMessage.className = "message";
+    });
+
     watcherForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const name = document.getElementById("watcher-name").value;
@@ -323,7 +328,18 @@ if (watcherForm && currentRole === "owner") {
             watcherMessage.textContent = "Watcher account created!";
             watcherMessage.className = "message success";
             watcherForm.reset();
+            
+            // Auto-collapse dropdown
+            if (watcherDropdown) watcherDropdown.open = false;
+
             fetchWatchers();
+
+            // Clear success message automatically after 3 seconds
+            setTimeout(() => {
+                watcherMessage.textContent = "";
+                watcherMessage.className = "message";
+            }, 3000);
+
         } catch (error) {
             watcherMessage.textContent = "Server error occurred.";
             watcherMessage.className = "message error";
